@@ -14,7 +14,8 @@ let roomNames = {}; // Store room names
 let userMetadata = {}; // Store user metadata (IP, username, etc.)
 let totalParticipants = 0; // Track total number of participants
 
-app.use(express.static("public"));
+// app.use(express.static("public"));
+app.use('/', express.static(path.join(__dirname, '../', 'public'), { maxAge: 31557600000 }));
 
 // Serve the main page
 app.get("/", (req, res) => {
@@ -197,8 +198,8 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Server is listening on port 3000");
+server.listen(3544, () => {
+  console.log("Server is listening on port 3544");
 });
 
 function formatMemoryUsage(memoryUsage) {
@@ -209,17 +210,17 @@ function formatMemoryUsage(memoryUsage) {
   return formattedUsage;
 }
 
-setInterval(() => {
-  const memoryUsage = process.memoryUsage();
-  const formattedMemoryUsage = formatMemoryUsage(memoryUsage);
+// setInterval(() => {
+//   const memoryUsage = process.memoryUsage();
+//   const formattedMemoryUsage = formatMemoryUsage(memoryUsage);
 
-  console.log(`Memory Usage:
-      RSS (Resident Set Size): ${formattedMemoryUsage.rss}
-      Heap Total: ${formattedMemoryUsage.heapTotal}
-      Heap Used: ${formattedMemoryUsage.heapUsed}
-      External: ${formattedMemoryUsage.external}
-      Array Buffers: ${formattedMemoryUsage.arrayBuffers}`);
-}, 60000); // Logs memory usage every minute
+//   console.log(`Memory Usage:
+//       RSS (Resident Set Size): ${formattedMemoryUsage.rss}
+//       Heap Total: ${formattedMemoryUsage.heapTotal}
+//       Heap Used: ${formattedMemoryUsage.heapUsed}
+//       External: ${formattedMemoryUsage.external}
+//       Array Buffers: ${formattedMemoryUsage.arrayBuffers}`);
+// }, 60000); // Logs memory usage every minute
 
 function isUserKicked(ip, roomId) {
   // Implement logic to check if the user with the given IP is kicked from the room
