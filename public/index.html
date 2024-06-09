@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blank Page: Collaborative Tool</title>
+    <link href="//stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/juejin.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/custom.css">
+</head>
+
+<body>
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <div class="col-md-3 bg-light sidebar d-flex flex-column p-3">
+                <img src="/blankpage_logo.png" alt="Logo" class="img-fluid my-3 rounded" style="max-width: 225px;margin: 0 auto;">
+                <button id="createRoom" class="btn btn-secondary btn-block mt-3">Create Room</button>
+                <button id="joinRoomButton" class="btn btn-secondary btn-block mt-3">Join Room</button>
+                <ul id="roomList" class="list-group mt-3 flex-grow-1 overflow-auto"></ul>
+                <div id="stats" class="mt-3">
+                    <p id="participantCount">Participants: 0</p>
+                    <p id="roomCount">Active Rooms: 0</p>
+                    <p>Authored by <a href="https://chrishacia.com" target="_blank">Christopher Hacia</a></p>
+                    <div class="d-flex justify-content-start">
+                        <a href="https://github.com/chrishacia" target="_blank" class="mr-2"><i
+                                class="fab fa-github"></i></a>
+                        <a href="https://linkedin.com/in/chrishacia" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 main p-3 d-flex flex-column">
+                <div id="context" class="flex-grow-1">
+                    <h2>Welcome to Blank Page!</h2>
+                    <p>Blank Page is a collaborative tool platform designed primarily for developers and software
+                        engineers to collaborate in real-time on code reviews, debugging, and code sharing. Our service
+                        allows you to create and join rooms where you can work together on plaintext documents with
+                        features like line numbers and syntax highlighting.</p>
+                    <h3>Features:</h3>
+                    <ul>
+                        <li><strong>Real-Time Collaboration:</strong> Work on code simultaneously with others, seeing
+                            their changes and cursor movements live.</li>
+                        <li><strong>Secure and Private:</strong> Your code is not stored on our servers longer than
+                            necessary. We ensure that your collaboration sessions are secure and ephemeral.</li>
+                        <li><strong>Custom Room Names:</strong> Create rooms with unique identifiers and optionally
+                            rename them for better organization.</li>
+                        <li><strong>Easy Sharing:</strong> Generate a room and share the link with your collaborators
+                            instantly.</li>
+                    </ul>
+                    <p>Get started by creating a new room or joining an existing one using the room ID shared with you.
+                        Enjoy seamless and productive code collaboration!</p>
+                    <p><strong><mark>Warning:</mark></strong> Refreshing the page may result in the room being closed if
+                        there are not enough active participants. 2 or more required.</p>
+                </div>
+                <div id="editor-container" class="flex-grow-1 d-flex flex-column" style="display: none;">
+                    <div id="roomName" class="h4 mb-3">Room: <span id="roomNameText"></span></div>
+                    <textarea id="editor" class="form-control flex-grow-1 mb-3" rows="20"
+                        placeholder="Collaborative Editor..."></textarea>
+                    <div id="additionalActions" class="mt-3 d-flex justify-content-between">
+                        <button id="leaveRoom" class="btn btn-danger-light"><i class="fas fa-sign-out-alt"></i></button>
+                        <div>
+                            <button id="downloadPdf" class="btn btn-secondary mr-2"><i
+                                    class="fas fa-file-pdf"></i></button>
+                            <button id="downloadTxt" class="btn btn-secondary mr-2"><i
+                                    class="fas fa-file-alt"></i></button>
+                            <button id="copyText" class="btn btn-secondary"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for room settings -->
+    <div class="modal" id="roomSettingsModal" tabindex="-1" role="dialog" aria-labelledby="roomSettingsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomSettingsModalLabel">Room Settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" placeholder="Room Name">
+                    <div class="additional-options" style="display: none;">
+                        <!-- Additional options for room creator go here -->
+                        <hr />
+                        <label>Room Admin:</label>
+                        <hr />
+                        <!-- <input type="text" class="form-control" placeholder="Some Creator Option"> -->
+                        <button type="button" id="closeRoom" class="btn btn-danger close-room mt-3"
+                            style="display: none;">Close Room</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveRoomSettings">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for setting username -->
+    <div class="modal" id="usernameModal" tabindex="-1" role="dialog" aria-labelledby="usernameModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="usernameModalLabel">Set Your Username</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="usernameInput" class="form-control" placeholder="Enter your username">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveUsername">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for setting room name -->
+    <div class="modal" id="roomNameModal" tabindex="-1" role="dialog" aria-labelledby="roomNameModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomNameModalLabel">Set Room Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="roomNameInput" class="form-control" placeholder="Enter room name">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveRoomName">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for entering room ID -->
+    <div class="modal" id="joinRoomModal" tabindex="-1" role="dialog" aria-labelledby="joinRoomModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinRoomModalLabel">Join Room</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="joinRoomId" class="form-control" placeholder="Enter Room ID">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="joinRoom">Join</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for leaving room -->
+    <div class="modal" id="leaveRoomModal" tabindex="-1" role="dialog" aria-labelledby="leaveRoomModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaveRoomModalLabel">Leave Room</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to leave this room?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmLeaveRoom">Leave</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="//code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="//stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closebrackets.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/selection/active-line.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/display/placeholder.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="/main.js"></script>
+</body>
+
+</html>

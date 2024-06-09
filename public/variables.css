@@ -1,0 +1,25 @@
+:root {
+    --primary-color: SteelBlue;
+    --primary-hover-color: #4682B4;
+    --secondary-color: #bbc7d3;
+    --secondary-hover-color: rgb(183, 173, 173);
+    --success-color: LimeGreen;
+    --success-hover-color: #32CD32;
+    --danger-color: rgb(249, 133, 113);
+    --danger-hover-color: #f88975;
+    --danger-light-color: #f8d7da;
+    /* New lighter danger color */
+    --danger-light-hover-color: #f5c6cb;
+    /* New lighter danger hover color */
+    --warning-color: Gold;
+    --warning-hover-color: #FFD700;
+    --info-color: DarkTurquoise;
+    --info-hover-color: #00CED1;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --input-border-color: SteelBlue;
+    --input-focus-border-color: #4682B4;
+    --light-bg-color: #f8f9fa;
+    --icon-color: SteelBlue;
+    --icon-hover-color: #4682B4;
+}

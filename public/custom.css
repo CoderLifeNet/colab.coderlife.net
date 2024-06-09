@@ -1,0 +1,72 @@
+/* custom.css */
+
+/* Import variables */
+@import url('variables.css');
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.container-fluid {
+    height: 100%;
+}
+
+.sidebar,
+.main {
+    height: 100%;
+}
+
+/* Ensure the textarea is 200px smaller than the viewport height */
+textarea#editor {
+    min-height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 200px) !important;
+    resize: none;
+}
+
+/* Style for settings and share icons */
+.settings-icon,
+.share-icon {
+    cursor: pointer;
+    color: var(--icon-color);
+}
+
+.settings-icon:hover,
+.share-icon:hover {
+    color: var(--icon-hover-color);
+}
+
+/* Additional margin for share icon */
+.share-icon {
+    margin-left: 8px;
+}
+
+#editor-container {
+    display: none !important;
+}
+
+#editor-container.d-flex {
+    display: flex !important;
+}
+
+.new-activity {
+    font-weight: bold;
+    background-color: #f5f2da;
+    /* You can change this to any color you prefer */
+}
+
+
+
+/* Custom styles for new-activity indicator */
+/* .list-group-item.new-activity {
+    background-color: #ffe4b5;
+} */
+
+/* Ensure the textarea is 200px smaller than the viewport height */
+textarea#editor,
+.CodeMirror {
+    min-height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 200px) !important;
+    resize: none;
+}
