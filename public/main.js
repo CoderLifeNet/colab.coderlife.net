@@ -1,4 +1,6 @@
-const ws = new WebSocket("ws://localhost:3000");
+//const ws = new WebSocket("ws://localhost:3544");
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const ws = new WebSocket(`${wsProtocol}//${window.location.host}`);
 let currentRoomId = null;
 let joinedRooms = new Set();
 let roomNames = {}; // Store custom room names

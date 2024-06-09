@@ -1,11 +1,18 @@
 const express = require("express");
-const http = require("http");
+const fs = require("fs");
+const https = require("https");
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(
+  {
+    cert: fs.readFileSync("/etc/letsencrypt/live/blankpage.org/fullchain.pem"),
+    key: fs.readFileSync("/etc/letsencrypt/live/blankpage.org/privkey.pem"),
+  },
+  app
+);
 const wss = new WebSocket.Server({ server });
 
 let rooms = {}; // Store active rooms and their members
@@ -14,8 +21,10 @@ let roomNames = {}; // Store room names
 let userMetadata = {}; // Store user metadata (IP, username, etc.)
 let totalParticipants = 0; // Track total number of participants
 
-// app.use(express.static("public"));
-app.use('/', express.static(path.join(__dirname, '../', 'public'), { maxAge: 31557600000 }));
+app.use(
+  "/",
+  express.static(path.join(__dirname, "../", "public"), { maxAge: 31557600000 })
+);
 
 // Serve the main page
 app.get("/", (req, res) => {
@@ -37,7 +46,30 @@ app.get("/privacy.html", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/privacy.html"));
 });
 
+const keepAliveInterval = 30000; // 30 seconds
+
 wss.on("connection", (ws, req) => {
+  ws.isAlive = true;
+
+  ws.on("pong", () => {
+    ws.isAlive = true;
+  });
+
+  const interval = setInterval(() => {
+    wss.clients.forEach((client) => {
+      if (!client.isAlive) {
+        return client.terminate();
+      }
+
+      client.isAlive = false;
+      client.ping();
+    });
+  }, keepAliveInterval);
+
+  ws.on("close", () => {
+    clearInterval(interval);
+  });
+
   ws.rooms = new Set(); // Initialize rooms set for each WebSocket connection
   const ip = req.socket.remoteAddress;
   totalParticipants++; // Increment total participants count
@@ -210,18 +242,6 @@ function formatMemoryUsage(memoryUsage) {
   return formattedUsage;
 }
 
-// setInterval(() => {
-//   const memoryUsage = process.memoryUsage();
-//   const formattedMemoryUsage = formatMemoryUsage(memoryUsage);
-
-//   console.log(`Memory Usage:
-//       RSS (Resident Set Size): ${formattedMemoryUsage.rss}
-//       Heap Total: ${formattedMemoryUsage.heapTotal}
-//       Heap Used: ${formattedMemoryUsage.heapUsed}
-//       External: ${formattedMemoryUsage.external}
-//       Array Buffers: ${formattedMemoryUsage.arrayBuffers}`);
-// }, 60000); // Logs memory usage every minute
-
 function isUserKicked(ip, roomId) {
   // Implement logic to check if the user with the given IP is kicked from the room
   // Return true if kicked, false otherwise
@@ -238,3 +258,15 @@ function broadcastStats() {
     }
   });
 }
+
+// setInterval(() => {
+//   const memoryUsage = process.memoryUsage();
+//   const formattedMemoryUsage = formatMemoryUsage(memoryUsage);
+
+//   console.log(`Memory Usage:
+//       RSS (Resident Set Size): ${formattedMemoryUsage.rss}
+//       Heap Total: ${formattedMemoryUsage.heapTotal}
+//       Heap Used: ${formattedMemoryUsage.heapUsed}
+//       External: ${formattedMemoryUsage.external}
+//       Array Buffers: ${formattedMemoryUsage.arrayBuffers}`);
+// }, 60000); // Logs memory usage every minute
