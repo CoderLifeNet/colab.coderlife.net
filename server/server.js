@@ -251,7 +251,7 @@ wss.on("connection", (ws, req) => {
 });
 
 server.listen(process.env.SERVER_PORT, () => {
-  console.log("Server is listening on port 3544");
+  console.log(`Server is listening on port ${process.env.SERVER_PORT}`);
 });
 
 function formatMemoryUsage(memoryUsage) {
