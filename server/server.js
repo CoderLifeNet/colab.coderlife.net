@@ -250,7 +250,7 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-server.listen(3544, () => {
+server.listen(process.env.SERVER_PORT, () => {
   console.log("Server is listening on port 3544");
 });
 
