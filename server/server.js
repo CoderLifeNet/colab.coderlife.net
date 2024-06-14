@@ -1,18 +1,38 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const fs = require("fs");
-const https = require("https");
+
+let httpProtocol = null;
+if (process.env.SERVER_ENV === "development") {
+  httpProtocol = require("http");
+} else {
+  httpProtocol = require("https");
+}
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 
 const app = express();
-const server = https.createServer(
-  {
-    cert: fs.readFileSync("/etc/letsencrypt/live/blankpage.org/fullchain.pem"),
-    key: fs.readFileSync("/etc/letsencrypt/live/blankpage.org/privkey.pem"),
-  },
-  app
-);
+
+let server = null;
+if (process.env.SERVER_ENV === "development") {
+  server = httpProtocol.createServer(app);
+} else {
+  server = httpProtocol.createServer(
+    {
+      cert: fs.readFileSync(
+        "/etc/letsencrypt/live/colab.coderlife.net/fullchain.pem"
+      ),
+      key: fs.readFileSync(
+        "/etc/letsencrypt/live/colab.coderlife.net/privkey.pem"
+      ),
+    },
+    app
+  );
+}
+
 const wss = new WebSocket.Server({ server });
 
 let rooms = {}; // Store active rooms and their members

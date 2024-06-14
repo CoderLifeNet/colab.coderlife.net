@@ -13,6 +13,20 @@ body {
     height: 100%;
 }
 
+.sidebar {
+    color: #CCC;
+
+    a {
+        color: #56c8a0;
+    }
+
+    button.btn {
+        background-color: #0d7450 !important;
+        border-color: #0d7450 !important;
+        color: #FFF !important;
+    }
+}
+
 .sidebar,
 .main {
     height: 100%;
