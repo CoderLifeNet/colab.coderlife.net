@@ -1,5 +1,5 @@
 {
-    "name": "blankpage.org",
+    "name": "collab.coderlife.net",
     "version": "1.0.0",
     "description": "A collaborative tool for web developers and software engineers.",
     "main": "server/server.js",
@@ -7,9 +7,9 @@
         "start": "node server/server.js"
     },
     "dependencies": {
-        "dotenv": "^16.4.5",
-        "express": "^4.17.1",
-        "uuid": "^9.0.1",
-        "ws": "^8.0.0"
+        "dotenv": "16.4.5",
+        "express": "4.17.1",
+        "uuid": "9.0.1",
+        "ws": "8.0.0"
     }
 }

@@ -23,10 +23,10 @@ if (process.env.SERVER_ENV === "development") {
   server = httpProtocol.createServer(
     {
       cert: fs.readFileSync(
-        "/etc/letsencrypt/live/colab.coderlife.net/fullchain.pem"
+        "/etc/letsencrypt/live/collab.coderlife.net/fullchain.pem"
       ),
       key: fs.readFileSync(
-        "/etc/letsencrypt/live/colab.coderlife.net/privkey.pem"
+        "/etc/letsencrypt/live/collab.coderlife.net/privkey.pem"
       ),
     },
     app
@@ -251,7 +251,7 @@ wss.on("connection", (ws, req) => {
 });
 
 server.listen(process.env.SERVER_PORT, () => {
-  console.log(`Server is listening on port ${process.env.SERVER_PORT}`);
+  console.log(`Server is listening on port http://localhost:${process.env.SERVER_PORT}`);
 });
 
 function formatMemoryUsage(memoryUsage) {
